@@ -1,6 +1,6 @@
 #include <Gamebuino-Meta.h>
 
-//merci à l'exemple "physics" pour les bouts de code :p
+//merci à l'exemple "physics" des librairies de la Meta pour les bouts de code :p
 
 //définition de la "trame" des tuiles de 4px * 4px et de la vitesse de chutte et du scrolling
 byte tilesize = 4;
