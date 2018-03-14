@@ -1,13 +1,14 @@
 #include <Gamebuino-Meta.h>
 
-//merci à l'exemple "physics" des librairies de la Meta pour les bouts de code :p
+//merci à l'exemple "physics" pour les bouts de code :p
 
 //définition de la "trame" des tuiles de 4px * 4px et de la vitesse de chutte et du scrolling
 byte tilesize = 4;
-float scrollspeed = 1;
-float gravity = 0.3;
-float friction = 0.9; //friction, dépends des surfaces
-float movespeed = 0.3; //contrôle de la vitesse de déplacement
+float scrollspeed = 0;
+float gravity = 0.3; //base 0.3
+float friction = 0.9; //friction, dépends des surfaces 0.9 de base
+float movespeed = 0.3; //contrôle de la vitesse de déplacement 0.3 de base
+float jump = 1; //saut 1 de base
 
 
 //define de type Box pour les obstacles et autres trucs "durs"
@@ -49,8 +50,21 @@ void loop() {
   while(!gb.update());
   gb.display.clear();
 
-  updatePlayer();
+
+  //TEST TEST TEST 
+  scrollspeed = 0;
+  if(gb.buttons.repeat(BUTTON_A, 1)){
+    scrollspeed = 1;
+  } 
+  if(gb.buttons.repeat(BUTTON_B, 1)){
+    scrollspeed = -1;
+  }
+  // TEST TEST TEST
+ 
   updatePlateforms();
+  updatePlayer();
+  
+   
   drawPlateforms();
   drawPlayer();
   drawBorders();
