@@ -68,15 +68,24 @@ void initBorders(){
 
 //scrolling Y des plateformes et génération de nouvelles en cas de sortie de l'écran
 void updatePlateforms() {
-    for(byte p=0; p<NUM_PLATEFORMS; p++){
+    for(byte p=0; p<NUM_PLATEFORMS; p = p + 2){ //plateformes de gauche
     plateforms[p].yv = scrollspeed; //vitesse du scrolling
     plateforms[p].y = plateforms[p].y - plateforms[p].yv; //et hop ça monte !
       if ( plateforms[p].y <= tilesize) { //génération d'une nvle plateforme en bas quand elle arrive dans la lave en haut
-        plateforms[p].y = 16*tilesize;
-        plateforms[p].w = random(3,5)*tilesize;
-        plateforms[p].x = random(4,11)*tilesize;
+        plateforms[p].y = 16*tilesize; //elle apparait "hors champ" en bas
+        plateforms[p].w = random(3,6)*tilesize;
+        plateforms[p].x = random(4,8)*tilesize;
       }
      }
+    for(byte p=1; p<NUM_PLATEFORMS; p = p + 2){ //plateformes de droite, en incluant un peu de math pour être sûr qu'il reste au moins un trou !
+    plateforms[p].yv = scrollspeed; //vitesse du scrolling
+    plateforms[p].y = plateforms[p].y - plateforms[p].yv; //et hop ça monte en suivant les copines de gauche !
+      if ( plateforms[p].y <= tilesize) { //génération d'une nvle plateforme en bas quand une arrive dans la lave en haut
+        plateforms[p].y = 16*tilesize; //elle apparait "hors champ" en bas
+        plateforms[p].w = (random(7,10)-(plateforms[p-1].w/tilesize))*tilesize;
+        plateforms[p].x = plateforms[p-1].x+plateforms[p-1].w+(random(0,4)*tilesize);
+      }
+     }    
   }
   
 

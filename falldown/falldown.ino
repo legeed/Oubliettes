@@ -2,13 +2,14 @@
 
 //merci à l'exemple "physics" pour les bouts de code :p
 
-//définition de la "trame" des tuiles de 4px * 4px et de la vitesse de chutte et du scrolling
+//définition de la "trame" des tuiles de 4px * 4px et de la vitesse de chutte et du scrolling, etc.
 byte tilesize = 4;
-float scrollspeed = 0;
+float scrollspeed = 0; //1 c'bien ouais ouais !!
 float gravity = 0.3; //base 0.3
 float friction = 0.9; //friction, dépends des surfaces 0.9 de base
-float movespeed = 0.3; //contrôle de la vitesse de déplacement 0.3 de base
+float movespeed = 0.4; //contrôle de la vitesse de déplacement 0.3 de base
 float jump = 1; //saut 1 de base
+int score = 0; //le score !!
 
 
 //define de type Box pour les obstacles et autres trucs "durs"
@@ -57,9 +58,14 @@ void loop() {
     scrollspeed = 1;
   } 
   if(gb.buttons.repeat(BUTTON_B, 1)){
+    scrollspeed = 3;
+  }
+  if(gb.buttons.repeat(BUTTON_B, 1) && gb.buttons.repeat(BUTTON_A, 1)){
     scrollspeed = -1;
   }
   // TEST TEST TEST
+
+  score ++;
  
   updatePlateforms();
   updatePlayer();

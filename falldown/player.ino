@@ -41,7 +41,7 @@ void updatePlayer(){ //la balle bouge !
     player.xv -= movespeed;
   }
   player.x += player.xv; //on avance
-  if(playerCollision()){
+  if(playerCollision() || playerBorder()){
     player.x -= player.xv; //on recule en cas de collision
     player.xv *= -0.5; //en sens inverse !
   }
@@ -60,11 +60,6 @@ boolean playerCollision(){ //détecte si collision avec un mur ou une plateforme
       return true;
     }
   }
-  for(byte i=0; i<NUM_BORDERS; i++){
-    if(gb.collideRectRect(player.x, player.y, player.w, player.h, borders[i].x, borders[i].y, borders[i].w, borders[i].h)){
-      return true;
-    }
-  }
   return false;
 }
 
@@ -77,6 +72,14 @@ boolean playerLanding(){ //détecte si le joueur est SUR une plateforme
   return false;
  }
 
+boolean playerBorder(){ //détecte si le joueur est contre une bordure  
+  for(byte i=0; i<NUM_BORDERS; i++){
+    if(gb.collideRectRect(player.x, player.y, player.w, player.h, borders[i].x, borders[i].y, borders[i].w, borders[i].h)){
+      return true;
+    }
+  }
+  return false;
+}
 
 
 
