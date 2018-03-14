@@ -12,7 +12,7 @@ void updatePlayer(){ //la balle bouge !
 
   //verticalement 
   
-  player.yv -= scrollspeed; //défilement
+  player.y -= scrollspeed; //défilement
   
   if (!playerLanding()){
   player.yv += gravity; //gravity
