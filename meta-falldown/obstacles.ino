@@ -1,12 +1,12 @@
-#define NUM_PLATEFORMS 10 //10 plateforms : 6 visibles + 4 invisibles pour le scrolling 
-MovingBox plateforms[NUM_PLATEFORMS]; //tableau avec les plateformes qui bougent dedans
+#define NUM_PLATEFORMS 10 //10 plateforms : visibles + invisibles pour le scrolling 
+MovingBox plateforms[NUM_PLATEFORMS]; //tableau avec les coordonnées des plateformes qui bougent dedans
 
 #define NUM_BORDERS 4 //4 "bôites" fixes qui symbolise les bords de la zone de jeu
-Box borders[NUM_BORDERS]; //tableau avec les plateformes qui bougent dedans
+Box borders[NUM_BORDERS];
 
 
 
- //fonction qui initialise mes plateforme en début de partie
+ //fonction qui initialise mes plateformes en début de partie
                         // je le fais avec des boucles, elles sont numérotées de 0 à 9
                         //0 1
                         //2 3
@@ -15,6 +15,7 @@ Box borders[NUM_BORDERS]; //tableau avec les plateformes qui bougent dedans
                         //8 9
                         
  void initPlateforms(){
+  //positions de départs, avec un tout petit peu d'aléatoire histoire de dire ...
   //je pourrais faire ça intelligemment avec des boucles for, ou pas :D
   
   for(byte p=0; p<NUM_PLATEFORMS; p++){ 
@@ -73,8 +74,8 @@ void updatePlateforms() {
     plateforms[p].y = plateforms[p].y - plateforms[p].yv; //et hop ça monte !
       if ( plateforms[p].y <= tilesize) { //génération d'une nvle plateforme en bas quand elle arrive dans la lave en haut
         plateforms[p].y = 16*tilesize; //elle apparait "hors champ" en bas
-        plateforms[p].w = random(3,5)*tilesize;
-        plateforms[p].x = random(4,8)*tilesize;
+        plateforms[p].w = random(pLWmin,pLWmax)*tilesize; //3 et 5 par défaut
+        plateforms[p].x = random(pLXmin,pLXmax)*tilesize; //4 et 8 par défaut
       }
      }
     for(byte p=1; p<NUM_PLATEFORMS; p = p + 2){ //plateformes de droite, en incluant un peu de math pour être sûr qu'il reste au moins un trou !
@@ -82,8 +83,8 @@ void updatePlateforms() {
     plateforms[p].y = plateforms[p].y - plateforms[p].yv; //et hop ça monte en suivant les copines de gauche !
       if ( plateforms[p].y <= tilesize) { //génération d'une nvle plateforme en bas quand une arrive dans la lave en haut
         plateforms[p].y = 16*tilesize; //elle apparait "hors champ" en bas
-        plateforms[p].w = (random(7,9)-(plateforms[p-1].w/tilesize))*tilesize;
-        plateforms[p].x = plateforms[p-1].x+plateforms[p-1].w+(random(0,4)*tilesize);
+        plateforms[p].w = (random(pRWmin,pRWmax)-(plateforms[p-1].w/tilesize))*tilesize; //7 et 9 pour w min max
+        plateforms[p].x = plateforms[p-1].x+plateforms[p-1].w+(random(pRXmin,pRXmax)*tilesize); //0 et 4 pour x min max
       }
      }    
   }
@@ -91,7 +92,7 @@ void updatePlateforms() {
 
 //dessin des plateforms
   void drawPlateforms(){
-  //dessin des "hitbox" des plateformes
+  //dessin des "hitbox" des plateformes à des fins de tests
   for(byte d=0; d<NUM_PLATEFORMS; d++){
   gb.display.setColor(BROWN);
   gb.display.fillRect(plateforms[d].x, plateforms[d].y, plateforms[d].w, plateforms[d].h);
@@ -104,7 +105,9 @@ void updatePlateforms() {
 
 //dessin des bordures
   void drawBorders(){
-  //dessin des "hitbox" des bordures
+  //dessin des bitmaps
+  //gb.display.drawImage(borders[0].x, borders[0].y, lava);
+  //dessin des "hitbox" des bordures à des fins de tests
   gb.display.setColor(RED);
   gb.display.fillRect(borders[0].x, borders[0].y, borders[0].w, borders[0].h);
   gb.display.setColor(BLUE);

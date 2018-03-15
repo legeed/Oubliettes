@@ -7,9 +7,18 @@ void initPlayer(){ //balance la balle au centre !
   player.h = tilesize;
   player.x = tilesize*10;
   player.y = tilesize*4;
+  boosttime = 125; //réinitialisation du boost
+  bonusscore = false; // par défaut les bonus sont invalidés
+  malusscore = false;
+  playerdead = false;
   }
 
+
+
 void updatePlayer(){ //la balle bouge !
+
+  bonusscore = false; // par défaut les bonus sont invalidés
+  malusscore = false;
   
   ////////verticalement 
   player.y -= scrollspeed; 
@@ -20,21 +29,30 @@ void updatePlayer(){ //la balle bouge !
   player.yv *= friction; //friction
   if(gb.buttons.timeHeld(BUTTON_UP) > 0 & gb.buttons.timeHeld(BUTTON_UP) < 5 && playerLanding()){ 
     player.yv -= jump; //jump baby jump, plus on appuie longtemps plus on saute haut, il faut être sur une platef. aussi !
+    boosttime = max(0,boosttime - 1); //sauter consomme du boost
   }
   player.y += player.yv; //on avance
   if(playerCollision()){
-    player.y -= player.yv; //on recule en cas de collision avec un bord
-    player.yv *= -0.5; //on ralenti et rebondi !
+    player.y -= player.yv; //on recule en cas de collision avec une plateforme
+    player.yv *= (-1)*rebound; //on ralenti et rebondi !
   }
   if (player.y >= 15*tilesize) {
     player.y -= player.yv; //on recule en cas de collision avec l'eau
-    player.yv *= -0.2; //on ralenti beaucoup et rebondi !
+    player.yv *= (-1)*(rebound/2); //on ralenti beaucoup et rebondi !
+    malusscore = true; //rester dans l'eau diminue le score
+  }
+  if (player.y < 1*tilesize) { //le joueur a dépassé la limite et s'est fait coincé
+    playerdead = true;
+  }
+  if ( (player.y < (4*tilesize)) && !playerdead ) { //le joueur est en haut de l'écran et son score profite du bonus
+    bonusscore = true;
   }
   
   ////////horizontalement
   player.xv *= friction; //friction
-  if (gb.buttons.repeat(BUTTON_A, 1)){ //Turbo !
+  if (gb.buttons.repeat(BUTTON_A, 1) && boosttime > 0){ //Turbo !
     player.xv *= 1.25;
+    boosttime = max(0,boosttime - 1); //consomme du boost
   }
   if(gb.buttons.repeat(BUTTON_RIGHT, 1)){
     player.xv += movespeed; //bouge en cas d'appui
@@ -45,12 +63,23 @@ void updatePlayer(){ //la balle bouge !
   player.x += player.xv; //on avance
   if(playerCollision() || playerBorder()){
     player.x -= player.xv; //on recule en cas de collision
-    player.xv *= -0.5; //en sens inverse !
+    player.xv *= (-1)*rebound; //en sens inverse !
   }
   ////////detection de la perte de vie
   if (player.y <= tilesize) {
     //faire des trucs qui font perdre  
   }
+
+  ////////calcul du score (à diviser par 25 au final, sinon ça dépasse trop) :p
+  score++; 
+  if (bonusscore) {
+    score++;
+  }
+  if (malusscore) {
+    score--;
+  }
+  lastscore = max(lastscore, score);
+  
 }
 
 void drawPlayer(){ //dessin de la balle

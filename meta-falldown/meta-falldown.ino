@@ -1,18 +1,48 @@
 #include <Gamebuino-Meta.h>
 
-//merci à l'exemple "physics" pour les bouts de code :p
+//META-FALLDOWN pour Gamebuino META - Par geed - 2018
+//merci à l'exemple "physics" de Rodot pour les bouts de code :p
 
-//définition de la "trame" des tuiles de 4px * 4px et de la vitesse de chutte et du scrolling, etc.
+//Paramètres du jeu - attention, ne pas trop bidouiller sinon ça plante !!
 byte tilesize = 4;
-float scrollspeed = 1; //1 c'bien ouais ouais !!
-float gravity = 0.5; //base 0.35
-float friction = 0.85; //friction, dépends des surfaces 0.9 de base
-float movespeed = 0.3; //contrôle de la vitesse de déplacement 0.4 de base
+float scrollspeed = 1; //1 c'bien ouais ouais !! ne pas trop toucher, sinon ça entre en conflit avec la "physique"
+float gravity = 0.7; //base 0.7
+float friction = 0.85; //friction, dépends des surfaces 0.85 de base
+float movespeed = 0.3; //contrôle de la vitesse de déplacement 0.3 de base
 float jump = 1; //saut 1 de base
+float rebound = 0.5; // 0.5 de base, c'est le rebond en cas de choc
+
+//variables diverses
+byte mode; // mode de jeu, change l'aléatoire pour plus de variété dans les parties 
+boolean pause = false; //tout ça c'est pour mes menus
+boolean presstart = false;
+boolean playerdead = false;
+boolean newgame = true;
+boolean bonusscore = false; // active le bonus de score qd le joueur est en haut
+boolean malusscore = false; //l'inverse, quand le joueur est dans l'eau ou utilise le boost
+int framecount = 0; // ça me sert à compter les frame dans plusieurs trucs
+
+//variables du joueur
+int score = 0;
+int lastscore = 0;
+int lives = 3;
+int boosttime = 125; //en frames donc 5s
 
 
+//contrôle de la difficultée via la taille des plateformes vu que le scrolling est relativement fixe
+// L pour plateformes de gauche, R pour droite
+// W c'est la longeur et X c'est la position
+byte pLWmin; // 3
+byte pLWmax; // 5
+byte pLXmin; // 4
+byte pLXmax; // 9
+byte pRWmin; // 7
+byte pRWmax; // 9
+byte pRXmin; // 0
+byte pRXmax; // 4
 
 
+//là je définit des types, ça permet de dire, par exemple, toutes les "boites"  ont une valeur w x h et y
 //define de type Box pour les obstacles et autres trucs "durs"
 typedef struct {
   byte w;//largeur
@@ -46,17 +76,8 @@ typedef struct {
 void setup() {
   // put your setup code here, to run once:
   gb.begin();
-  
   randomSeed(analogRead(0));
   //ça c'est une astuce pour les random pour être sûr de partir sur une "graine" différente à chaque lancement
-  
-
-  initBorders();
-  initPlateforms();
-  initPlayer();
-
-    
-  
 }
 
 
@@ -65,23 +86,36 @@ void loop() {
   while(!gb.update());
   gb.display.clear();
 
-
-  if(gb.buttons.repeat(BUTTON_MENU, 1)){
-  initBorders();
-  initPlateforms();
-  initPlayer();
+  if(newgame){ //inserer ici le menu de démarrage du jeu 
+  mainMenu();
+    if (presstart) {
+      initBorders();
+      initPlateforms();
+      initPlayer();
+      setMode();
+      newgame = false;
+      presstart = false;
+    }
+  }
+  
+  if(playerdead){ //inserer ici le menu "nouvelle" vie
+    lives --;
+    if (lives == 0) {
+      newgame = true;
+    }
+    initBorders();
+    initPlateforms();
+    initPlayer();
   }
 
- 
-  updatePlateforms();
-  updatePlayer();
-  
-   
-  drawPlateforms();
-  drawPlayer();
-  drawBorders();
-  drawInterface();
-  
+  if (!newgame) { //le jeu tourne normalement
+    updatePlateforms(); //mise à jour des positions des plateformes (dans obstacles)
+    updatePlayer(); //mise à jour du joueur (dans player)
+    drawPlateforms(); //dessin des plateforme à l'écran
+    drawPlayer(); //dessin du joueur à l'écran
+    drawBorders(); //dessin des bordures à l'écran
+    drawInterface(); //dessin des éléments d'interfaces à l'écran (dans interface)
+  }
 
 
 }
