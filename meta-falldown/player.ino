@@ -7,7 +7,7 @@ void initPlayer(){ //balance la balle au centre !
   player.h = tilesize;
   player.x = tilesize*10;
   player.y = tilesize*4;
-  boosttime = 125; //réinitialisation du boost
+  boosttime = 100; //réinitialisation du boost
   bonusscore = false; // par défaut les bonus sont invalidés
   malusscore = false;
   playerdead = false;
@@ -50,10 +50,14 @@ void updatePlayer(){ //la balle bouge !
   
   ////////horizontalement
   player.xv *= friction; //friction
-  if (gb.buttons.repeat(BUTTON_A, 1) && boosttime > 0){ //Turbo !
+  if (gb.buttons.repeat(BUTTON_A, 1) && boosttime > 0 && playerLanding() ){ //Turbo !
     player.xv *= 1.25;
     boosttime = max(0,boosttime - 1); //consomme du boost
   }
+  if (gb.buttons.repeat(BUTTON_B, 1) && boosttime > 0 && playerLanding() ){ //Brake !
+    player.xv *= 0.75;
+    boosttime = max(0,boosttime - 1); //consomme du boost aussi :p
+  }  
   if(gb.buttons.repeat(BUTTON_RIGHT, 1)){
     player.xv += movespeed; //bouge en cas d'appui
     }
@@ -70,12 +74,29 @@ void updatePlayer(){ //la balle bouge !
     //faire des trucs qui font perdre  
   }
 
+  ////////detection du ramassage d'un bonus - je teste la collision ici directement
+  for(byte i=0; i<NUM_BONUS; i++){
+    if(gb.collideRectRect(player.x, player.y, player.w, player.h, bonus[i].x, bonus[i].y, bonus[i].w, bonus[i].h)){
+      switch (bonus[i].type) {
+        case 1: //bonus type 1 c'est du score
+          score += 250;
+        break;
+        case 2: //bonus type 2 c'est du boost
+          boosttime = min(boosttime+50,125);
+        break;
+      }
+      bonus[i].type = 0; //le bonus est ramassé !
+    }
+  }
+  
+
   ////////calcul du score (à diviser par 25 au final, sinon ça dépasse trop) :p
   score++; 
   if (bonusscore) {
     score++;
   }
   if (malusscore) {
+    score--;
     score--;
   }
   lastscore = max(lastscore, score);

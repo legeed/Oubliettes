@@ -1,12 +1,15 @@
 #define NUM_PLATEFORMS 10 //10 plateforms : visibles + invisibles pour le scrolling 
 MovingBox plateforms[NUM_PLATEFORMS]; //tableau avec les coordonnées des plateformes qui bougent dedans
 
-#define NUM_BORDERS 4 //4 "bôites" fixes qui symbolise les bords de la zone de jeu
+#define NUM_BORDERS 4 //4 "bôites" fixes qui symbolisent les bords de la zone de jeu
 Box borders[NUM_BORDERS];
 
+#define NUM_BONUS 2 //2 "boîtes" bonus au dessus des plateformes elle apparaissent aléatoirement, 2 au maximum
+MovingBox bonus[NUM_BONUS];
 
 
- //fonction qui initialise mes plateformes en début de partie
+
+ //fonction qui initialise mes plateformes (et les bonus) en début de partie
                         // je le fais avec des boucles, elles sont numérotées de 0 à 9
                         //0 1
                         //2 3
@@ -40,6 +43,17 @@ Box borders[NUM_BORDERS];
     plateforms[p].x = random(11,13)*tilesize;
     plateforms[p].y = plateforms[p-2].y - 3*tilesize;
   }
+
+  for(byte p=0; p<NUM_BONUS; p++){
+  bonus[p].type = 0; //à 0 elles ne sont pas affichées, 1 c'est du score, 2 c'est du boost
+  bonus[p].w = tilesize;
+  bonus[p].xv = 0;
+  bonus[p].h = tilesize;
+  bonus[p].yv = -scrollspeed; 
+  bonus[p].x = 0;
+  bonus[p].y = 60; 
+  }
+  
 }  
 
 
@@ -69,6 +83,14 @@ void initBorders(){
 
 //scrolling Y des plateformes et génération de nouvelles en cas de sortie de l'écran
 void updatePlateforms() {
+    
+    for (byte b=0; b<NUM_BONUS; b++){ //boites bonus
+      if (bonus[b].y <= tilesize ) { //je les fais disparaitre si elles arrivent en haut, j'en générerai une nouvelle avec une plateforme
+        bonus[b].type = 0;
+      }
+       bonus[b].y += bonus[b].yv;  //hop ça monte !
+    }
+  
     for(byte p=0; p<NUM_PLATEFORMS; p = p + 2){ //plateformes de gauche
     plateforms[p].yv = scrollspeed; //vitesse du scrolling
     plateforms[p].y = plateforms[p].y - plateforms[p].yv; //et hop ça monte !
@@ -76,8 +98,14 @@ void updatePlateforms() {
         plateforms[p].y = 16*tilesize; //elle apparait "hors champ" en bas
         plateforms[p].w = random(pLWmin,pLWmax)*tilesize; //3 et 5 par défaut
         plateforms[p].x = random(pLXmin,pLXmax)*tilesize; //4 et 8 par défaut
-      }
-     }
+        if( bonus[0].type == 0 ) {
+          bonus[0].x = random(4,9)*tilesize;
+          bonus[0].y = plateforms[p].y-tilesize;
+          bonus[0].type = random(1,3);
+        }
+        
+       }
+    }
     for(byte p=1; p<NUM_PLATEFORMS; p = p + 2){ //plateformes de droite, en incluant un peu de math pour être sûr qu'il reste au moins un trou !
     plateforms[p].yv = scrollspeed; //vitesse du scrolling
     plateforms[p].y = plateforms[p].y - plateforms[p].yv; //et hop ça monte en suivant les copines de gauche !
@@ -85,8 +113,15 @@ void updatePlateforms() {
         plateforms[p].y = 16*tilesize; //elle apparait "hors champ" en bas
         plateforms[p].w = (random(pRWmin,pRWmax)-(plateforms[p-1].w/tilesize))*tilesize; //7 et 9 pour w min max
         plateforms[p].x = plateforms[p-1].x+plateforms[p-1].w+(random(pRXmin,pRXmax)*tilesize); //0 et 4 pour x min max
-      }
-     }    
+        if( bonus[1].type == 0 ) {
+          bonus[1].x = random(10,14)*tilesize;;
+          bonus[1].y = plateforms[p].y-tilesize;
+          bonus[1].type = random(1,3);
+        }
+       }
+     }
+
+    
   }
   
 
@@ -100,6 +135,16 @@ void updatePlateforms() {
   for(byte d=0; d<NUM_PLATEFORMS; d++){
   gb.display.setColor(PINK);
   gb.display.drawRect(plateforms[d].x+1, plateforms[d].y-1, plateforms[d].w-2, 1);
+    }
+  for (byte d=0; d<NUM_BONUS; d++){ //dessin des bonus, ssi leur état est à 1 ou 2
+     if ( bonus[d].type == 1) {
+     gb.display.setColor(BLUE);
+     gb.display.drawRect(bonus[d].x, bonus[d].y, bonus[d].w, bonus[d].h);
+     }
+     if ( bonus[d].type == 2) {
+     gb.display.setColor(YELLOW);
+     gb.display.drawRect(bonus[d].x, bonus[d].y, bonus[d].w, bonus[d].h);
+     }
     }
   }
 

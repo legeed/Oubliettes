@@ -9,7 +9,7 @@ float scrollspeed = 1; //1 c'bien ouais ouais !! ne pas trop toucher, sinon ça 
 float gravity = 0.7; //base 0.7
 float friction = 0.85; //friction, dépends des surfaces 0.85 de base
 float movespeed = 0.3; //contrôle de la vitesse de déplacement 0.3 de base
-float jump = 1; //saut 1 de base
+float jump = 2.5; //saut 1 de base
 float rebound = 0.5; // 0.5 de base, c'est le rebond en cas de choc
 
 //variables diverses
@@ -26,7 +26,7 @@ int framecount = 0; // ça me sert à compter les frame dans plusieurs trucs
 int score = 0;
 int lastscore = 0;
 int lives = 3;
-int boosttime = 125; //en frames donc 5s
+int boosttime = 100; //en frames donc 4s
 
 
 //contrôle de la difficultée via la taille des plateformes vu que le scrolling est relativement fixe
@@ -76,8 +76,6 @@ typedef struct {
 void setup() {
   // put your setup code here, to run once:
   gb.begin();
-  randomSeed(analogRead(0));
-  //ça c'est une astuce pour les random pour être sûr de partir sur une "graine" différente à chaque lancement
 }
 
 
