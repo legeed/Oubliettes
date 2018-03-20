@@ -1,2 +1,3 @@
-# meta-falldown
-a small falldown-like game for gamebuino meta
+# Oubliettes
+
+Oubliettes is a falldown-like game for the Gamebuino Meta
