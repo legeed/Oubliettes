@@ -9,7 +9,7 @@ void initPlayer(){ //balance la balle au centre !
   player.h = tilesize;
   player.x = tilesize*10;
   player.y = tilesize*4;
-  boosttime = 100; //réinitialisation du boost
+  boosttime = 80; //réinitialisation du boost
   bonusscore = false; // par défaut les bonus sont invalidés
   malusscore = false;
   }
@@ -38,7 +38,7 @@ void updatePlayer(){ //la balle bouge !
   if(playerCollision()){
     player.y -= player.yv; //on recule en cas de collision avec une plateforme
     player.yv *= (-1)*rebound; //on ralenti et rebondi !
-    gb.sound.playTick();
+    //gb.sound.playTick();
   }
   if (player.y >= 15*tilesize) {
     player.y -= player.yv; //on recule en cas de collision avec l'eau
@@ -68,13 +68,13 @@ void updatePlayer(){ //la balle bouge !
   if(playerCollision() || playerBorder()){
     player.x -= player.xv; //on recule en cas de collision
     player.xv *= (-1)*rebound; //en sens inverse !
-    gb.sound.playTick();
+    //gb.sound.playTick();
   }
   
   ///////le joueur est en haut de l'écran et son score profite du bonus mais je l'alerte avec les led
   if ( (player.y < (4*tilesize)) && player.y > tilesize  ) { 
     bonusscore = true;
-    gb.lights.drawPixel(0, 0, RED);
+    //gb.lights.drawPixel(0, 0, RED);
   }
 
   ////////detection du ramassage d'un bonus - je teste la collision ici directement
@@ -85,10 +85,11 @@ void updatePlayer(){ //la balle bouge !
           score += 250;
         break;
         case 2: //bonus type 2 c'est du boost
-          boosttime = min(boosttime+15,100);
+          boosttime = min(boosttime+10,100);
+          score += 50;
         break;
       }
-      gb.lights.drawPixel(0, 0, WHITE);
+      //gb.lights.drawPixel(0, 0, WHITE);
       bonus[i].type = 0; //le bonus est ramassé !
     }
   }
@@ -100,8 +101,8 @@ void updatePlayer(){ //la balle bouge !
     score++;
   }
   if (malusscore) {
-    score = score - 2;
-    gb.lights.drawPixel(0, 0, BLUE);
+    score = max(score-25,1);
+    //gb.lights.drawPixel(0, 0, BLUE);
   }
       
   ////////detection de la perte de vie

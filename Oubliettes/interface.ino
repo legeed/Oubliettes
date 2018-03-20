@@ -21,6 +21,9 @@
    gb.display.setCursor(55, 51);
    gb.display.print(int(bestscore/25)); 
     }
+  if (gb.buttons.repeat(BUTTON_B,1) && gb.buttons.repeat(BUTTON_MENU,1)) {
+    debug = true;
+  }
   }
  
 
@@ -66,7 +69,11 @@
 
 
   void drawBack() {
-  gb.display.drawImage(0, 0, back); //fond
+  if (score > 6000) {
+    gb.display.drawImage(0, 0, castle);  
+  } else {
+    gb.display.drawImage(0, 0, back); //fond
+  }
   //jauge de boost un carré coloré masqué par un carré noir en fonction du boost restant
   gb.display.setColor(YELLOW); 
   gb.display.fillRect(5,39,4,20);

@@ -16,6 +16,7 @@ float friction = 0.85; //friction, dépends des surfaces 0.85 de base
 float movespeed = 0.3; //contrôle de la vitesse de déplacement 0.3 de base
 float jump = 2.5; //saut 1 de base
 float rebound = 0.5; // 0.5 de base, c'est le rebond en cas de choc
+boolean debug = false;
 
 //variables diverses
 byte mode; // mode de jeu, change l'aléatoire pour plus de variété dans les parties 
@@ -110,7 +111,7 @@ void loop() {
       drawPlateforms(); //dessin des plateforme à l'écran
       drawPlayer(); //dessin du joueur à l'écran
       drawInterface(); //dessin des éléments d'interfaces à l'écran (dans interface)
-      //drawBenchmark(); //pour avoir des stats sur le CPU et la ram
+      if (debug) {drawBenchmark();} //pour avoir des stats sur le CPU et la ram
       if (presstart) {
         gamestate = 4; //->pause
       }
