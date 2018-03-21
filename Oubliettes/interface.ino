@@ -22,7 +22,7 @@
    gb.display.print(int(bestscore/25)); 
     }
   if (gb.buttons.repeat(BUTTON_B,1) && gb.buttons.repeat(BUTTON_MENU,1)) {
-    debug = true;
+    debug = !debug;
   }
   }
  
@@ -69,7 +69,7 @@
 
 
   void drawBack() {
-  if (score > 6000) {
+  if (score > 15000) {
     gb.display.drawImage(0, 0, castle);  
   } else {
     gb.display.drawImage(0, 0, back); //fond

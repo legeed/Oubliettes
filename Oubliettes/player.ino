@@ -51,11 +51,11 @@ void updatePlayer(){ //la balle bouge !
   ////////horizontalement
   player.xv *= friction; //friction
   if (gb.buttons.repeat(BUTTON_A, 1) && boosttime > 0 && playerLanding() ){ //Turbo !
-    player.xv *= 1.25;
+    player.xv *= 1.30;
     boosttime = max(0,boosttime - 2); //consomme du boost
   }
   if (gb.buttons.repeat(BUTTON_B, 1) && boosttime > 0 && playerLanding() ){ //Brake !
-    player.xv *= 0.50;
+    player.xv *= 0.60;
     boosttime = max(0,boosttime - 2); //consomme du boost aussi :p
   }  
   if(gb.buttons.repeat(BUTTON_RIGHT, 1)){
