@@ -1,165 +1,169 @@
+// ###########################################################################
+//         
+//
+// 		    Title: Oubliettes.ino
+//         Author: Jean-Baptiste Chaffange Koch
+//    Description: A falldown-like game for Gamebuino Meta.
+//        Version: 1.0.0
+//           Date: 22 Mar 2018
+//        License: GPLv3 (see LICENSE)
+//
+//    Oubliettes Copyright (C) 2018 Jean-Baptiste Chaffange Koch
+//    This program is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    any later version.
+//		
+//	  Merci à Aurelien Rodot pour le programme "Physics" de la bibliothèque GB Meta
+//
+// 
+//###########################################################################
+
+
+
+// ###########################################################################
+//    VARIABLES
+// ###########################################################################
+
 #include <Gamebuino-Meta.h>
 
-//META-FALLDOWN pour Gamebuino META - Par geed - 2018
-//merci à l'exemple "physics" de Rodot pour les bouts de code ainsi qu'à la communauté :p
-//ainsi qu'au créateur de https://opengameart.org/content/4x4-dark-platform-tileset qui a fait un supertaf
-//les graphismes sont largement inspirés de cette toute petite image :)
-//
+String VERSION = "V1"; //version du jeu
 
-String VERSION = "V1";
-
-//Paramètres du jeu - attention, ne pas trop bidouiller sinon ça plante !!
+//Paramètres physiques du jeu
 byte tilesize = 4;
-float scrollspeed; //1 c'bien ouais ouais !! ne pas trop toucher, sinon ça entre en conflit avec la "physique"
-float gravity = 0.7; //base 0.7
-float friction = 0.85; //friction, dépends des surfaces 0.85 de base
-float movespeed = 0.3; //contrôle de la vitesse de déplacement 0.3 de base
-float jump = 2.5; //saut 1 de base
-float rebound = 0.5; // 0.5 de base, c'est le rebond en cas de choc
-boolean debug = false;
+float scrollspeed;
+float gravity = 0.7;
+float friction = 0.85;
+float movespeed = 0.3;
+float jump = 2.5;
+float rebound = 0.5;
 
-//variables diverses
-byte mode; // mode de jeu, change l'aléatoire pour plus de variété dans les parties 
-int pause = 75; //temps de pause pour nouvelle vie
-byte gamestate = 1; //0 running, 1 mainmenu, 2 gameover menu, 3 nvle vie, 4 pause
-boolean presstart = false; //a appuyé sur A ?
-boolean highscore = false; //a fait un meilleur score !
-boolean bonusscore = false; // active le bonus de score qd le joueur est en haut
-boolean malusscore = false; //l'inverse, quand le joueur est dans l'eau ou utilise le boost
-int framecount = 0; // ça me sert à compter les frame dans plusieurs trucs
-int timerinit = 0; //pareil, je compte des trucs avec
+//Variables d'état diverses
+boolean debug = false; 		    //active le mode "debug"
+byte mode=0;  				        //change l'aléatoire dans la génération des plateformes
+byte gamestate = 1; 		      //0 : jeu en cours, 1 : menu principal, 2 : gameover, 3 : nouvelle vie, 4 : pause
+boolean presstart = false; 	  //le joueur a appuyé sur Start (ou autre) ?
+boolean highscore = false; 	  //le joueur a fait un meilleur score !
+boolean bonusscore = false;   //le joueur active le bonus de score
+boolean malusscore = false;   //le joueur active le malus de score
+int framecount = 0; 		      //comptage de frame, utile dans certaines fonctions
+int timerinit = 0; 			      //idem
 
 //variables du joueur
-float score = 0;
-int lastscore = 0;
-int bestscore = 0;
-int lives;
-int boosttime = 100; //en frames donc 4s
+float score = 0;		  	//score actuel
+int lastscore = 0;			//score de la dernière partie
+int bestscore = 0;			//meilleur score
+int lives;					    //vies restantes
+int boosttime = 100; 		//en frames donc 4s
 
-
-//contrôle de la difficultée via la taille des plateformes vu que le scrolling est relativement fixe
-// L pour plateformes de gauche, R pour droite
-// W c'est la longeur et X c'est la position
-byte pLWmin; // 3
-byte pLWmax; // 5
-byte pLXmin; // 4
-byte pLXmax; // 9
-byte pRWmin; // 7
-byte pRWmax; // 9
-byte pRXmin; // 0
-byte pRXmax; // 4
-
-
-//là je définit des types, ça permet de dire, par exemple, toutes les "boites"  ont une valeur w x h et y
-//define de type Box pour les obstacles et autres trucs "durs"
+//là je définit des struct, ça permet de dire, par exemple,que toutes que les "boites" ont une valeur w x h et y
+//define de type Box pour les obstacles "durs"
 typedef struct {
-  byte w;//largeur
-  byte x;//pos X
-  byte h;//hauteur
-  byte y; //pos Y
-  byte type; //etat, type, etc
+  byte w;					  //largeur
+  byte x;					  //pos X
+  byte h;					  //hauteur
+  byte y; 					//pos Y
+  byte type; 				//etat, type, etc
 } Box;
 
-//define de type MovingBox pour les trucs qui "bougent"
+//define de type MovingBox pour les obstacles qui "bougent"
 typedef struct {
-  byte w; //largeur
-  float x; //pos X
-  float xv; //vitesse X
-  byte h; //hauteur
-  float y; //pos Y
-  float yv; //vitesse Y
-  byte type; //etat, type, etc
+  byte w; 					//largeur
+  float x;					//pos X
+  float xv;					//vitesse X
+  byte h;					  //hauteur
+  float y; 					//pos Y
+  float yv; 				//vitesse Y
+  byte type; 				//etat, type, etc
 } MovingBox;
 
 //define de type MovingBoxP pour le joueur
 typedef struct {
-  byte w; //largeur
-  float x; //pos X
-  float xv; //vitesse X
-  byte h; //hauteur
-  float y; //pos Y
-  float yv; //vitesse Y
+  byte w; 					//largeur
+  float x; 					//pos X
+  float xv; 				//vitesse X
+  byte h; 					//hauteur
+  float y; 					//pos Y
+  float yv; 				//vitesse Y
 } MovingBoxP;
 
 
-//////////////////////////////////////////////
 
+// ###########################################################################
+//    SETUP
+// ###########################################################################
 
 void setup() {
 
   gb.begin();
-  bestscore = gb.save.get(0); //je recup l'ancien best score de la sauvegarde
+  bestscore = gb.save.get(0); //recupère l'ancien bestscore de la sauvegarde n° 0
 }
 
 
-//////////////////////////////////////////////
 
+// ###########################################################################
+//    LOOP
+// ###########################################################################
 
 void loop() {
    
-  while(!gb.update());
+  while(!gb.update());			//indispensable
   
-  gb.display.clear();
-  gb.lights.clear();
+  gb.display.clear();			//efface l'écran
+  gb.lights.clear();			//efface les lumières
 
-  switch (gamestate) {
-    case 0: //jeu en cours
-      presstart = false; //bon, pour le coup, presstart est lié à C, d'hbaitude il est lié à A
-      updatePlateforms(); //mise à jour des positions des plateformes (dans obstacles)
-      updatePlayer(); //mise à jour du joueur (dans player)
-      drawBack(); //dessin de l'arrière plan
-      drawPlateforms(); //dessin des plateforme à l'écran
-      drawPlayer(); //dessin du joueur à l'écran
-      drawInterface(); //dessin des éléments d'interfaces à l'écran (dans interface)
-      if (debug) {drawBenchmark();} //pour avoir des stats sur le CPU et la ram
-      if (presstart) {
-        gamestate = 4; //->pause
-      }
-      break;
-    case 1: //menu principal
-      presstart = false;
-      lives = 3;
-      setMode();
-      drawMain(); //ecran principal
-      if (presstart) {
-        gamestate = 3;
-      }
-      break;
-    case 2: //menu gameover
-      presstart = false;
-      if (highscore) {
-        drawHscore(); //high score !
-      } else {      
-      drawGameover(); //ecran gameover
-      }
-      if (presstart) {
-        lives = 3;
-        setMode();
-        gamestate = 3;
-      }
-      break;
-    case 3: //nouvelle vie
-      presstart = false;
-      initBorders();
-      initPlateforms();
-      drawBack();
-      drawInterface();
-      drawReady(); //ecran "pret ?"
-      if (presstart) {
-        initPlayer(); //initialisation du joueur
-        gamestate = 0;
-      }   
-      break;
-    case 4: //pause
-      presstart = false;
-      drawBack(); 
-      drawPlateforms();
-      drawPlayer();
-      drawInterface();
-      drawPause(); //pause
-      if (presstart) {
-      gamestate = 0;
-      }
-      break;
-  }
-}
+  switch (gamestate) {			//sélection l'état du jeu en fonction de la variable gamestate, c'est comme un IF mais avec un choix !
+    case 0: 						//Jeu en cours
+      presstart = false; 				//bon, pour le coup, presstart est lié à MENU pour la pause (d'habitude il est lié à A)
+      updatePlateforms(); 			//mise à jour des positions des plateformes (dans obstacles)
+      updatePlayer(); 					//mise à jour du joueur (dans player)
+      drawBack();               //dessin de l'arrière plan (dans interface)
+      drawPlateforms(); 				//dessin des plateforme à l'écran (dans interface)
+      drawPlayer(); 				  	//dessin du joueur à l'écran (dans player)
+      drawInterface(); 					//dessin des éléments d'interfaces à l'écran (dans interface)
+      if (debug) {drawBenchmark();} 	//pour avoir des stats sur le CPU et la ram en cas d'appui sur B et MENU (dans interface)
+      if (presstart) {gamestate = 4;} 	//->pause
+      break;							//sort du switch()
+    case 1: 					//Menu principal
+      presstart = false;				//
+      lives = 3;						//3 vies
+	    setMode();						//choix aléatoire du mode de génération des plateformes (dans obstacles)
+      drawMain();           //ecran principal		//dessin de l'écran d'accueil	(dans interface)
+      if (presstart) {gamestate = 3;}	//->nouvelle vie
+      break;							  //sort du switch()
+    case 2: 					//Menu gameover
+      presstart = false;				//
+      if (highscore) {drawHscore(); 	//Si le score est un high score, Gameover ne s'affiche pas (dans interface)
+      } else {      				        	// sinon
+      drawGameover();} 				      	// affichage de l'ecran gameover (dans interface)
+      if (presstart) {				      	//En cas d'appui sur A
+        lives = 3;						        //Réinitialisation puis -> nouvelle vie
+        setMode();					        	//
+        gamestate = 3;				        //
+      }									              //
+      break;							            //
+    case 3: 					//Nouvelle vie
+      presstart = false;				//
+      initBorders();				    //Initialisation des bordures (dans obstacles)
+      initPlateforms();					//Initialisation des plateformes (dans obstacles)
+      drawBack();						    //dessin de l'arrière plan (dans interface)
+      drawInterface();					//dessin des éléments d'interfaces à l'écran (dans interface)
+      drawReady(); 						  //ecran "pret ?" (dans interface)
+      if (presstart) {					//si appui sur A
+        initPlayer(); 					//initialisation du joueur
+        gamestate = 0;					//redémarrage du jeu
+      }   								      //
+      break;							      //
+    case 4: 					//Pause
+      presstart = false;				//dans cet état, je dessine tout, mais ne remet pas les positions du joueur et des plateformes à jour
+      drawBack(); 						  //dessin de l'arrière plan (dans interface)
+      drawPlateforms();					//dessin des plateforme à l'écran (dans interface)
+      drawPlayer(); 					  //dessin du joueur à l'écran (dans player)
+      drawInterface();					//dessin des éléments d'interfaces à l'écran (dans interface)
+      drawPause(); 						  //dessin du menu pause
+      if (presstart) {					//retour au jeu avec un appui sur un bouton
+      gamestate = 0;					  //
+      }									        //
+      break;							      //
+  }								//fin du switch
+}						//fin du loop
