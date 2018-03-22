@@ -30,11 +30,11 @@
   gb.display.setColor(GRAY);
   gb.display.setCursor(0, 0);
   gb.display.print(VERSION); 
-  if  (gb.buttons.repeat(BUTTON_MENU,1)) {	//avec un appui sur MENU je lance le jeu j'affiche les commandes
+  if  (gb.buttons.repeat(BUTTON_MENU,1)) {	//avec un appui sur MENU j'affiche les commandes
    gb.display.clear();
    gb.display.drawImage(0, 0, howto);
     }
-  if  (gb.buttons.repeat(BUTTON_B,1)) {		//avec un appui sur B je lance le jeu j'affiche les scores
+  if  (gb.buttons.repeat(BUTTON_B,1)) {		//avec un appui sur B j'affiche les scores
    gb.display.clear();
    gb.display.drawImage(0, 0, hscore);
    gb.display.setColor(WHITE);
