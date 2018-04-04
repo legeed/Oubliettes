@@ -58,6 +58,8 @@ void updatePlayer(){					      //les fonctions de collisions sont décrites tout
   if(playerCollision()){								      //test de collision avec une plateforme
     player.y = player.y - player.yv; 				  //en cas de collision j'annule le déplacement 
     player.yv *= (-1)*rebound; 							  //je "ralenti" le joueur et inverse son sens de déplacement
+    //gb.lights.drawPixel(0, 2, WHITE);
+    //gb.lights.drawPixel(1, 2, WHITE);
   }
   if (player.y >= 15*tilesize) {						//test de collision avec le slime
     player.y -= player.yv; 								  //en cas de collision j'annule le déplacement
@@ -97,10 +99,12 @@ void updatePlayer(){					      //les fonctions de collisions sont décrites tout
       switch (bonus[i].type) {					//si il y a collision, je détermine le type du bonus et applique les conséquences au score et/ou au boosttime
         case 1: 									      //bonus type 1 c'est du score
           score += 250;
+          gb.lights.fill(BROWN);
         break;
         case 2: 									    //bonus type 2 c'est du boost (et un peu de score)
           boosttime = min(boosttime+10,100);
           score += 50;
+          gb.lights.fill(BROWN);
         break;
       }
       bonus[i].type = 0; 							//le bonus est ramassé, son état passe à 0, il ne sera plus affiché et régénéré à la prochain apparition de plateforme
@@ -110,8 +114,14 @@ void updatePlayer(){					      //les fonctions de collisions sont décrites tout
 //  Calcul du score
 //-------------------------------------------------------------
   score++; 											              //à chaque frame, le score prends +1 (Pour l'affichage, toutefois, je le divise par 25 sinon c'est trop grand)
-  if (bonusscore) {score++;}						      //si bonusscore est activé, il prends +1 supplémentaire
-  if (malusscore) {score = max(score-25,1);}	//si malusscore est activé, il diminue
+  if (bonusscore) {
+    score++;                                  //si bonusscore est activé, il prends +1 supplémentaire
+    gb.lights.drawPixel(0, 0, RED);
+    gb.lights.drawPixel(1, 0, RED);}						      
+  if (malusscore) {                           //si malusscore est activé, il diminue
+    score = max(score-25,1);
+    gb.lights.drawPixel(0, 4, GREEN);
+    gb.lights.drawPixel(1, 4, GREEN);}	
 //-------------------------------------------------------------
 // Gestion des vies, du score et du gameover    
 //-------------------------------------------------------------

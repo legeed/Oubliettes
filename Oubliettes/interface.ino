@@ -30,11 +30,11 @@
   gb.display.setColor(GRAY);
   gb.display.setCursor(0, 0);
   gb.display.print(VERSION); 
-  if  (gb.buttons.repeat(BUTTON_MENU,1)) {	//avec un appui sur MENU j'affiche les commandes
+  if  (gb.buttons.repeat(BUTTON_MENU,1)) {	//avec un appui j'affiche les commandes
    gb.display.clear();
    gb.display.drawImage(0, 0, howto);
     }
-  if  (gb.buttons.repeat(BUTTON_B,1)) {		//avec un appui sur B j'affiche les scores
+  if  (gb.buttons.repeat(BUTTON_B,1)) {		//avec un appui j'affiche les scores
    gb.display.clear();
    gb.display.drawImage(0, 0, hscore);
    gb.display.setColor(WHITE);
@@ -120,6 +120,7 @@ void drawGameover() {
   if (gb.buttons.pressed(BUTTON_B) || gb.buttons.pressed(BUTTON_MENU)) {  	// B ou C retour au menu principal en changeant le gamestate
     gamestate = 1;
     }
+  gb.lights.fill(RED);
 } //fin de drawGameover()
   
   
@@ -131,6 +132,7 @@ void drawReady() {
    gb.display.setColor(WHITE);
    gb.display.setCursor(27, 14);
    gb.display.print("Ready ?");
+   gb.lights.fill(BLUE);
     if ( gb.buttons.pressed(BUTTON_A) || gb.buttons.pressed(BUTTON_B) ) { //avec un appui sur A ou B je relance rapidement le jeu
       presstart = true;
     }
@@ -156,6 +158,7 @@ void drawReady() {
       gb.display.setCursor(20, 18);
       gb.display.print("Pause");
       gb.display.setFontSize(1);
+      gb.lights.fill(BLUE);
       if ( gb.buttons.pressed(BUTTON_A) || gb.buttons.pressed(BUTTON_B) || gb.buttons.pressed(BUTTON_MENU)) { 
           presstart = true; //avec un appui sur un bouton je relance le jeu
       }

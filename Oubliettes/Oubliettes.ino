@@ -48,6 +48,7 @@ boolean bonusscore = false;   //le joueur active le bonus de score
 boolean malusscore = false;   //le joueur active le malus de score
 int framecount = 0; 		      //comptage de frame, utile dans certaines fonctions
 int timerinit = 0; 			      //idem
+boolean gblights = true;
 
 //variables du joueur
 float score = 0;		  	//score actuel
@@ -96,6 +97,7 @@ typedef struct {
 void setup() {
 
   gb.begin();
+  //gb.display.init(160, 128, ColorMode::index); 
   bestscore = gb.save.get(0); //recupère l'ancien bestscore de la sauvegarde n° 0
 }
 
